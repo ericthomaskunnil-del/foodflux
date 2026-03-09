@@ -1,0 +1,158 @@
+<%- include('layout/header') %>
+
+    <div class="container" style="margin-top: 100px; padding-bottom: 60px;">
+
+        <div style="text-align: center; margin-bottom: 40px;">
+            <span class="hero-badge" style="margin: 0 auto 16px;">📊 Analytics</span>
+            <h1 class="dashboard-title">Global Impact Dashboard</h1>
+            <p class="section-subtitle">Transparent, real-time metrics showing how Food Flux is combating food waste
+                globally.</p>
+        </div>
+
+        <!-- Impact Stats -->
+        <div class="dashboard-stats"
+            style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px;">
+            <div class="stat-card">
+                <div class="stat-value">
+                    <%= stats.totalListings %>
+                </div>
+                <div class="stat-label">Food Listings Created</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">
+                    <%= stats.completedPickups %>
+                </div>
+                <div class="stat-label">Successful Pickups</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">
+                    <%= stats.totalDonors %>
+                </div>
+                <div class="stat-label">Active Donors</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">
+                    <%= stats.totalVolunteers %>
+                </div>
+                <div class="stat-label">Registered Volunteers</div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="chart-container-row">
+
+            <!-- Sparkline Chart -->
+            <div class="chart-card half">
+                <h3 style="margin-bottom: 10px; font-weight: 600; text-align: center;">Meals Distributed</h3>
+                <div class="chart-wrapper" style="height: 150px;">
+                    <canvas id="monthlyTrendChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Doughnut Chart Row 2 -->
+            <div class="chart-card half">
+                <h3 style="margin-bottom: 20px; font-weight: 600; text-align: center;">Food Categories</h3>
+                <div class="chart-wrapper" style="height: 250px;">
+                    <canvas id="foodTypesChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Bar Chart -->
+            <div class="chart-card half">
+                <h3 style="margin-bottom: 20px; font-weight: 600; text-align: center;">Top Impact Areas</h3>
+                <div class="chart-wrapper" style="height: 250px;">
+                    <canvas id="impactAreasChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboards Section -->
+        <div style="margin-top: 50px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <span class="hero-badge">🏆 Food Flux Heroes</span>
+                <h2 style="font-size: 2rem; margin-top: 10px;">Leaderboards</h2>
+            </div>
+
+            <div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+
+                <!-- Top Donors -->
+                <div class="card" style="flex: 1; min-width: 260px; max-width: 500px;">
+                    <div class="card-header" style="background: rgba(var(--primary-rgb), 0.1);">
+                        <h3>🥇 Top Donors</h3>
+                    </div>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <% if(topDonors && topDonors.length> 0) { %>
+                            <% topDonors.forEach((donor, index)=> { %>
+                                <li
+                                    style="padding: 15px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+                                    <div style="display: flex; align-items: center; gap: 15px;">
+                                        <div
+                                            style="width: 35px; height: 35px; border-radius: 50%; background: var(--primary-color); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                                            <%= index + 1 %>
+                                        </div>
+                                        <div>
+                                            <strong>
+                                                <%= donor.donorDetails.name %>
+                                            </strong>
+                                            <div style="font-size: 0.85em; color: var(--text-muted);">
+                                                <%= donor.donorDetails.restaurantName || 'Individual Donor' %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <strong style="color: var(--accent-color); font-size: 1.2em;">
+                                            <%= donor.count %>
+                                        </strong>
+                                        <div style="font-size: 0.8em; color: var(--text-muted);">Listings</div>
+                                    </div>
+                                </li>
+                                <% }) %>
+                                    <% } else { %>
+                                        <li style="padding: 15px; text-align: center; color: var(--text-muted);">No
+                                            donors yet</li>
+                                        <% } %>
+                    </ul>
+                </div>
+
+                <!-- Top Volunteers -->
+                <div class="card" style="flex: 1; min-width: 260px; max-width: 500px;">
+                    <div class="card-header" style="background: rgba(var(--success-rgb), 0.1);">
+                        <h3>🦸 Top Volunteers</h3>
+                    </div>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <% if(topVolunteers && topVolunteers.length> 0) { %>
+                            <% topVolunteers.forEach((vol, index)=> { %>
+                                <li
+                                    style="padding: 15px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+                                    <div style="display: flex; align-items: center; gap: 15px;">
+                                        <div
+                                            style="width: 35px; height: 35px; border-radius: 50%; background: var(--success-color); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                                            <%= index + 1 %>
+                                        </div>
+                                        <div>
+                                            <strong>
+                                                <%= vol.volunteerDetails.name %>
+                                            </strong>
+                                        </div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <strong style="color: var(--success-color); font-size: 1.2em;">
+                                            <%= vol.count %>
+                                        </strong>
+                                        <div style="font-size: 0.8em; color: var(--text-muted);">Pickups</div>
+                                    </div>
+                                </li>
+                                <% }) %>
+                                    <% } else { %>
+                                        <li style="padding: 15px; text-align: center; color: var(--text-muted);">No
+                                            volunteers yet</li>
+                                        <% } %>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <%- include('layout/footer') %>

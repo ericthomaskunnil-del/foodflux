@@ -1,0 +1,257 @@
+<%- include('../layout/header') %>
+
+    <section class="dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <div>
+                    <h1>Admin Dashboard</h1>
+                    <p>Monitor and manage the Food Flux platform</p>
+                </div>
+            </div>
+
+            <!-- Analytics Cards -->
+            <div class="stats-row stats-row-wide">
+                <div class="stat-card stat-card-accent">
+                    <div class="stat-card-icon">👥</div>
+                    <div class="stat-card-info">
+                        <span class="stat-card-value">
+                            <%= stats.totalUsers %>
+                        </span>
+                        <span class="stat-card-label">Total Users</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon">🍱</div>
+                    <div class="stat-card-info">
+                        <span class="stat-card-value">
+                            <%= stats.totalDonors %>
+                        </span>
+                        <span class="stat-card-label">Donors</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon">🚚</div>
+                    <div class="stat-card-info">
+                        <span class="stat-card-value">
+                            <%= stats.totalVolunteers %>
+                        </span>
+                        <span class="stat-card-label">Volunteers</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon">📋</div>
+                    <div class="stat-card-info">
+                        <span class="stat-card-value">
+                            <%= stats.totalListings %>
+                        </span>
+                        <span class="stat-card-label">Total Listings</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon">📦</div>
+                    <div class="stat-card-info">
+                        <span class="stat-card-value">
+                            <%= stats.availableListings %>
+                        </span>
+                        <span class="stat-card-label">Available</span>
+                    </div>
+                </div>
+                <div class="stat-card stat-card-success">
+                    <div class="stat-card-icon">✅</div>
+                    <div class="stat-card-info">
+                        <span class="stat-card-value">
+                            <%= stats.completedPickups %>
+                        </span>
+                        <span class="stat-card-label">Completed</span>
+                    </div>
+                </div>
+                <div class="stat-card stat-card-warning">
+                    <div class="stat-card-icon">⏳</div>
+                    <div class="stat-card-info">
+                        <span class="stat-card-value">
+                            <%= stats.pendingApprovals %>
+                        </span>
+                        <span class="stat-card-label">Pending Approval</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- All Listings -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>All Food Listings</h2>
+                </div>
+                <% if (listings.length===0) { %>
+                    <div class="empty-state">
+                        <span class="empty-icon">📭</span>
+                        <h3>No listings</h3>
+                        <p>No food listings have been created yet</p>
+                    </div>
+                    <% } else { %>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Food</th>
+                                        <th>Donor</th>
+                                        <th>Quantity</th>
+                                        <th>Location</th>
+                                        <th>Status</th>
+                                        <th>Approved</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% listings.forEach(listing=> { %>
+                                        <tr>
+                                            <td><strong>
+                                                    <%= listing.foodName %>
+                                                        <% if (listing.isUrgent) { %>
+                                                            <span
+                                                                style="color: red; font-size: 0.8em; margin-left: 5px;">(Urgent)</span>
+                                                            <% } %>
+                                                </strong></td>
+                                            <td>
+                                                <%= listing.donor ? listing.donor.name : 'N/A' %>
+                                            </td>
+                                            <td>
+                                                <%= listing.quantity %>
+                                            </td>
+                                            <td>
+                                                <%= listing.location %>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-<%= listing.status %>">
+                                                    <%= listing.status.charAt(0).toUpperCase() + listing.status.slice(1)
+                                                        %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span
+                                                    class="badge badge-<%= listing.approved ? 'available' : 'expired' %>">
+                                                    <%= listing.approved ? 'Approved' : 'Pending' %>
+                                                </span>
+                                            </td>
+                                            <td class="actions-cell">
+                                                <% if (!listing.approved) { %>
+                                                    <form action="/admin/approve/<%= listing._id %>" method="POST"
+                                                        style="display:inline;">
+                                                        <button type="submit"
+                                                            class="btn btn-sm btn-primary">Approve</button>
+                                                    </form>
+                                                    <% } %>
+                                                        <form action="/admin/listing/delete/<%= listing._id %>"
+                                                            method="POST" style="display:inline;"
+                                                            id="adel-<%= listing._id %>">
+                                                            <button type="button" class="btn btn-sm btn-danger"
+                                                                onclick="confirmAction('Delete this listing?', 'adel-<%= listing._id %>')">Delete</button>
+                                                        </form>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                        <% } %>
+            </div>
+
+            <!-- All Users -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>All Users</h2>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Joined</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% users.forEach(u=> { %>
+                                <tr>
+                                    <td><strong>
+                                            <%= u.name %>
+                                        </strong></td>
+                                    <td>
+                                        <%= u.email %>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-role badge-<%= u.role %>">
+                                            <%= u.role.charAt(0).toUpperCase() + u.role.slice(1) %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <%= new Date(u.createdAt).toLocaleDateString() %>
+                                    </td>
+                                    <td>
+                                        <% if (u._id.toString() !==user.id) { %>
+                                            <form action="/admin/user/delete/<%= u._id %>" method="POST"
+                                                style="display:inline;" id="udel-<%= u._id %>">
+                                                <button type="button" class="btn btn-sm btn-danger"
+                                                    onclick="confirmAction('Delete this user and all their data?', 'udel-<%= u._id %>')">Delete</button>
+                                            </form>
+                                            <% } else { %>
+                                                <span class="text-muted">You</span>
+                                                <% } %>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recent Transactions -->
+            <% if (transactions.length> 0) { %>
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Recent Transactions</h2>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Food</th>
+                                    <th>Donor</th>
+                                    <th>Volunteer</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% transactions.forEach(t=> { %>
+                                    <tr>
+                                        <td>
+                                            <%= t.listing ? t.listing.foodName : 'Deleted' %>
+                                        </td>
+                                        <td>
+                                            <%= t.donor ? t.donor.name : 'N/A' %>
+                                        </td>
+                                        <td>
+                                            <%= t.volunteer ? t.volunteer.name : 'N/A' %>
+                                        </td>
+                                        <td>
+                                            <span
+                                                class="badge badge-<%= t.status === 'completed' ? 'completed' : 'picked' %>">
+                                                <%= t.status.charAt(0).toUpperCase() + t.status.slice(1) %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <%= new Date(t.createdAt).toLocaleDateString() %>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <% } %>
+        </div>
+    </section>
+
+    <%- include('../layout/footer') %>

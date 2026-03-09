@@ -1,0 +1,58 @@
+<%- include('layout/header') %>
+
+    <section class="auth-section">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>Welcome Back</h1>
+                <p>Login to your Food Flux account</p>
+            </div>
+
+            <form action="/auth/login" method="POST" class="auth-form">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="••••••••" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="role">Login As</label>
+                    <select id="role" name="role" required>
+                        <option value="" disabled selected>Select your role</option>
+                        <option value="admin">🛡️ Admin</option>
+                        <option value="donor">🍱 Donor</option>
+                        <option value="volunteer">🚚 Volunteer</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full">Login</button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="/auth/register">Register here</a></p>
+            </div>
+
+            <div class="demo-credentials">
+                <h4>Demo Accounts</h4>
+                <div class="demo-grid">
+                    <div class="demo-item">
+                        <span class="demo-role">Admin</span>
+                        <code>admin@lfds.com / admin123</code>
+                    </div>
+                    <div class="demo-item">
+                        <span class="demo-role">Donor</span>
+                        <code>donor@lfds.com / donor123</code>
+                    </div>
+                    <div class="demo-item">
+                        <span class="demo-role">Volunteer</span>
+                        <code>volunteer@lfds.com / volunteer123</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <%- include('layout/footer') %>

@@ -1,0 +1,269 @@
+<%- include('../layout/header') %>
+
+    <section class="dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <div>
+                    <h1>Volunteer Dashboard</h1>
+                    <p>Find and pick up surplus food for distribution</p>
+                </div>
+            </div>
+
+            <!-- Live Map Area -->
+            <div class="card"
+                style="margin-bottom: 2rem; padding: 0; overflow: hidden; border: 1px solid var(--border-color);">
+                <div class="card-header"
+                    style="border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
+                    <h2 style="font-size: 1.25rem;">Live Donation Map</h2>
+                </div>
+                <div id="volunteer-map" style="height: 400px; width: 100%; z-index: 1;"
+                    data-listings="<%= JSON.stringify(availableListings) %>"></div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-card-icon">📦</div>
+                    <div class="stat-card-info">
+                        <span class="stat-card-value">
+                            <%= availableListings.length %>
+                        </span>
+                        <span class="stat-card-label">Available Now</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon">🚚</div>
+                    <div class="stat-card-info">
+                        <span class="stat-card-value">
+                            <%= myPickups.filter(p=> p.status === 'accepted').length %>
+                        </span>
+                        <span class="stat-card-label">In Progress</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon">✅</div>
+                    <div class="stat-card-info">
+                        <span class="stat-card-value">
+                            <%= myPickups.filter(p=> p.status === 'completed').length %>
+                        </span>
+                        <span class="stat-card-label">Completed</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Available Listings -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Available Food Listings</h2>
+                </div>
+                <% if (availableListings.length===0) { %>
+                    <div class="empty-state">
+                        <span class="empty-icon">🍃</span>
+                        <h3>No available listings</h3>
+                        <p>Check back later for new food surplus listings</p>
+                    </div>
+                    <% } else { %>
+                        <div class="listings-grid">
+                            <% availableListings.forEach(listing=> { %>
+                                <div class="listing-card"
+                                    style="<%= listing.isUrgent ? 'border: 2px solid red;' : '' %>">
+                                    <div class="listing-card-header">
+                                        <h3>
+                                            <%= listing.foodName %>
+                                        </h3>
+                                        <div>
+                                            <% if (listing.isUrgent) { %>
+                                                <span class="badge"
+                                                    style="background-color: red; color: white;">Urgent</span>
+                                                <% } %>
+                                                    <span class="badge badge-available">Available</span>
+                                        </div>
+                                    </div>
+                                    <div class="listing-card-body">
+                                        <div class="listing-detail">
+                                            <span class="detail-icon">📦</span>
+                                            <span>
+                                                <%= listing.quantity %>
+                                            </span>
+                                        </div>
+                                        <div class="listing-detail">
+                                            <span class="detail-icon">📍</span>
+                                            <span>
+                                                <%= listing.location %>
+                                            </span>
+                                        </div>
+                                        <div class="listing-detail">
+                                            <span class="detail-icon">🕐</span>
+                                            <span>Pickup: <%= listing.pickupTime %></span>
+                                        </div>
+                                        <div class="listing-detail">
+                                            <span class="detail-icon">⏰</span>
+                                            <span>Expires: <%= listing.expiryTime %></span>
+                                        </div>
+                                        <% if (listing.description) { %>
+                                            <p class="listing-description">
+                                                <%= listing.description %>
+                                            </p>
+                                            <% } %>
+                                                <div class="listing-donor">
+                                                    <span>Posted by: <strong>
+                                                            <%= listing.donor ? listing.donor.name : 'Unknown' %>
+                                                        </strong></span>
+                                                </div>
+                                    </div>
+                                    <div class="listing-card-footer">
+                                        <form action="/volunteer/accept/<%= listing._id %>" method="POST"
+                                            id="accept-<%= listing._id %>">
+                                            <button type="button" class="btn btn-primary btn-full"
+                                                onclick="confirmAction('Accept this pickup?', 'accept-<%= listing._id %>')">
+                                                Accept Pickup
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <% }) %>
+                        </div>
+                        <% } %>
+            </div>
+
+            <!-- My Pickups -->
+            <% if (myPickups.length> 0) { %>
+                <div class="card">
+                    <div class="card-header">
+                        <h2>My Pickup History</h2>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Food</th>
+                                    <th>Donor</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% myPickups.forEach(pickup=> { %>
+                                    <tr>
+                                        <td><strong>
+                                                <%= pickup.listing ? pickup.listing.foodName : 'Deleted' %>
+                                            </strong></td>
+                                        <td>
+                                            <%= pickup.donor ? pickup.donor.name : 'N/A' %>
+                                        </td>
+                                        <td>
+                                            <span
+                                                class="badge badge-<%= pickup.status === 'completed' ? 'completed' : 'picked' %>">
+                                                <%= pickup.status.charAt(0).toUpperCase() + pickup.status.slice(1) %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <%= new Date(pickup.createdAt).toLocaleDateString() %>
+                                        </td>
+                                        <td>
+                                            <% if (pickup.status==='accepted' ) { %>
+                                                <form action="/volunteer/collect/<%= pickup._id %>" method="POST"
+                                                    id="collect-<%= pickup._id %>">
+                                                    <button type="button" class="btn btn-sm btn-primary"
+                                                        onclick="confirmAction('Mark as collected?', 'collect-<%= pickup._id %>')">
+                                                        Mark Collected
+                                                    </button>
+                                                </form>
+                                                <% } else { %>
+                                                    <span class="text-muted">Done ✓</span>
+                                                    <% } %>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <% } %>
+        </div>
+    </section>
+
+    <!-- Leaflet Map Initialization Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mapEl = document.getElementById('volunteer-map');
+            if (mapEl && typeof L !== 'undefined') {
+                // Initialize map (default center somewhere typical, or dynamically calculated)
+                // Let's use a default center, e.g., NYC, then fit bounds if markers exist
+                const map = L.map('volunteer-map').setView([40.7128, -74.0060], 12);
+
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                    subdomains: 'abcd',
+                    maxZoom: 20
+                }).addTo(map);
+
+                // Parse available listings from data attribute
+                const listingsRaw = JSON.parse(mapEl.dataset.listings || '[]');
+
+                const bounds = [];
+
+                listingsRaw.forEach(listing => {
+                    // Try to get coords from listing directly, or fallback to donor coords
+                    let lat, lng;
+                    if (listing.locationCoords && listing.locationCoords.lat && listing.locationCoords.lng) {
+                        lat = listing.locationCoords.lat;
+                        lng = listing.locationCoords.lng;
+                    } else if (listing.donor && listing.donor.locationCoords && listing.donor.locationCoords.lat && listing.donor.locationCoords.lng) {
+                        lat = listing.donor.locationCoords.lat;
+                        lng = listing.donor.locationCoords.lng;
+                    }
+
+                    if (lat && lng) {
+                        const marker = L.marker([lat, lng]).addTo(map);
+
+                        // Create popup content
+                        const urgencyWarning = listing.isUrgent ? '<p style="margin: 0 0 5px; color: red; font-weight: bold;">🚨 URGENT: Expiring Soon!</p>' : '';
+                        const popupContent = `
+                            <div style="color: #333; font-family: 'Inter', sans-serif;">
+                                <h4 style="margin: 0 0 5px; font-weight: 600;">${listing.foodName}</h4>
+                                ${urgencyWarning}
+                                <p style="margin: 0 0 5px; font-size: 0.9em;"><strong>Quantity:</strong> ${listing.quantity}</p>
+                                <p style="margin: 0; font-size: 0.9em;"><strong>Pickup:</strong> ${listing.pickupTime}</p>
+                            </div>
+                        `;
+                        marker.bindPopup(popupContent);
+                        bounds.push([lat, lng]);
+                    }
+                });
+
+                if (bounds.length > 0) {
+                    map.fitBounds(bounds, { padding: [50, 50] });
+                }
+            }
+        });
+    </script>
+
+    <!-- Socket.io connection -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const currentUserId = '<%= user.id %>';
+
+        // Join realtime room
+        socket.emit('joinRoom', currentUserId);
+
+        socket.on('newMatch', (listing) => {
+            // Show a floating toast notification
+            const toast = document.createElement('div');
+            toast.className = 'toast toast-success';
+            toast.style.position = 'fixed';
+            toast.style.bottom = '20px';
+            toast.style.right = '20px';
+            toast.style.zIndex = '9999';
+            toast.innerHTML = `
+                <strong>🔔 New Food Match!</strong><br>
+                ${listing.foodName} (${listing.quantity}) is available nearby!<br>
+                <button onclick="window.location.reload()" style="margin-top:10px; padding: 5px; background: white; color: var(--primary-color); border:none; border-radius:3px; cursor:pointer;">Refresh Map</button>
+            `;
+            document.body.appendChild(toast);
+        });
+    </script>
+
+    <%- include('../layout/footer') %>

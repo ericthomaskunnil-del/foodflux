@@ -1,0 +1,245 @@
+<%- include('layout/header') %>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="orb-wrapper" data-hue="0" data-hover-intensity="2" data-rotate-on-hover="true"
+            data-bg-color="#0a0a1a"></div>
+        <div class="container hero-content">
+            <span class="hero-badge">🌍 Making a Difference Locally</span>
+            <h1>Don't Waste Food.<br><span class="gradient-text">Distribute It.</span></h1>
+            <p class="hero-subtitle">
+                Connecting restaurants, event organizers, and individuals with NGOs and volunteers
+                to ensure surplus food reaches those who need it most.
+            </p>
+            <div class="hero-actions">
+                <a href="/auth/register" class="btn btn-primary btn-lg">Start Donating</a>
+                <a href="/auth/login" class="btn btn-glass btn-lg">Login →</a>
+            </div>
+            <div class="hero-image">
+                <img src="/images/hero-food-sharing.png" alt="Volunteers distributing surplus food">
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">500+</span>
+                    <span class="stat-label">Meals Saved</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">50+</span>
+                    <span class="stat-label">Active Donors</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">30+</span>
+                    <span class="stat-label">Volunteers</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="section" id="how-it-works">
+        <div class="container">
+            <h2 class="section-title">How It <span class="gradient-text">Works</span></h2>
+            <p class="section-subtitle">Three simple steps to reduce food waste in your community</p>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-card-img">
+                        <img src="/images/food-donation.png" alt="Donor packaging food">
+                    </div>
+                    <div class="step-icon">📋</div>
+                    <div class="step-number">01</div>
+                    <h3>List Surplus Food</h3>
+                    <p>Restaurants and event organizers post surplus food with pickup details and expiry time.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">✅</div>
+                    <div class="step-number">02</div>
+                    <h3>Admin Approves</h3>
+                    <p>Our team verifies listings for quality and safety before making them available.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-card-img">
+                        <img src="/images/volunteer-pickup.png" alt="Volunteer delivering food">
+                    </div>
+                    <div class="step-icon">🚚</div>
+                    <div class="step-number">03</div>
+                    <h3>Volunteer Picks Up</h3>
+                    <p>Volunteers accept pickups and deliver food to shelters, communities, and those in need.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Impact Graph Section -->
+    <section class="section" id="impact">
+        <div class="container">
+            <h2 class="section-title">Our <span class="gradient-text">Impact at a Glance</span></h2>
+            <p class="section-subtitle">A live interactive look at our monthly food surplus distribution numbers.</p>
+            <div class="chart-container-row">
+                <div class="chart-card">
+                    <div class="chart-wrapper" style="height: 350px;">
+                        <canvas id="homeImpactChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="/dashboard" class="btn btn-outline btn-lg">View Full Analytics Dashboard →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section section-dark">
+        <div class="container">
+            <h2 class="section-title">Why Choose <span class="gradient-text">Food Flux?</span></h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Real-Time Listings</h3>
+                    <p>See available food in real-time with status badges and expiry tracking.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📍</div>
+                    <h3>Location Based</h3>
+                    <p>Find surplus food near you with location details for easy pickup.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Track Impact</h3>
+                    <p>Monitor your contributions with detailed analytics and history.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Secure & Verified</h3>
+                    <p>All listings are admin-verified. Role-based access keeps data safe.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Image Gallery Section -->
+    <section class="section" id="gallery">
+        <div class="container">
+            <h2 class="section-title">Moments of <span class="gradient-text">Impact</span></h2>
+            <p class="section-subtitle">Real moments from our food distribution community</p>
+            <div class="gallery-grid">
+                <div class="gallery-item gallery-item-large">
+                    <img src="/images/community-sharing.png" alt="Community food sharing event" loading="lazy">
+                    <div class="gallery-overlay">
+                        <h3>Community Sharing</h3>
+                        <p>Volunteers distribute fresh food at local events</p>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="/images/restaurant-donation.png" alt="Restaurant preparing food donations" loading="lazy">
+                    <div class="gallery-overlay">
+                        <h3>Restaurant Donations</h3>
+                        <p>Chefs packaging surplus meals with care</p>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="/images/volunteer-delivery.png" alt="Volunteer delivering food to elderly" loading="lazy">
+                    <div class="gallery-overlay">
+                        <h3>Doorstep Delivery</h3>
+                        <p>Bringing food directly to those in need</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials / Reviews Section -->
+    <section class="section section-dark" id="reviews">
+        <div class="container">
+            <h2 class="section-title">What People <span class="gradient-text">Say</span></h2>
+            <p class="section-subtitle">Hear from the donors and volunteers making a difference every day</p>
+
+            <div class="testimonials-grid">
+                <% if (reviews && reviews.length> 0) { %>
+                    <% reviews.forEach(review=> { %>
+                        <div class="testimonial-card">
+                            <div class="testimonial-stars">
+                                <% for (let i=0; i < review.rating; i++) { %>⭐<% } %>
+                            </div>
+                            <% if (review.comment) { %>
+                                <p class="testimonial-text">"<%= review.comment %>"</p>
+                                <% } else { %>
+                                    <p class="testimonial-text">"Great experience with Food Flux! Highly recommended."
+                                    </p>
+                                    <% } %>
+                                        <div class="testimonial-author">
+                                            <div class="testimonial-avatar">
+                                                <%= review.reviewer.name.charAt(0).toUpperCase() %>
+                                            </div>
+                                            <div>
+                                                <strong>
+                                                    <%= review.reviewer.name %>
+                                                </strong>
+                                                <span class="testimonial-role">
+                                                    <%= review.reviewer.role==='volunteer' ? '🚚 Volunteer' : '🍱 Donor'
+                                                        %>
+                                                </span>
+                                            </div>
+                                        </div>
+                        </div>
+                        <% }) %>
+                            <% } else { %>
+                                <!-- Placeholder testimonials when no reviews exist yet -->
+                                <div class="testimonial-card">
+                                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                                    <p class="testimonial-text">"Food Flux has made it incredibly easy for us to donate
+                                        surplus food from our restaurant. The volunteer network is amazingly
+                                        responsive!"</p>
+                                    <div class="testimonial-author">
+                                        <div class="testimonial-avatar">R</div>
+                                        <div>
+                                            <strong>Rajesh Kumar</strong>
+                                            <span class="testimonial-role">🍱 Restaurant Owner</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="testimonial-card">
+                                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                                    <p class="testimonial-text">"Being a volunteer with Food Flux gives me purpose. I
+                                        love seeing the grateful smiles when I deliver fresh meals to families."</p>
+                                    <div class="testimonial-author">
+                                        <div class="testimonial-avatar">P</div>
+                                        <div>
+                                            <strong>Priya Sharma</strong>
+                                            <span class="testimonial-role">🚚 Volunteer</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="testimonial-card">
+                                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                                    <p class="testimonial-text">"The platform is so well built. From listing food to
+                                        getting a volunteer to pick it up, everything happens within minutes.
+                                        Brilliant!"</p>
+                                    <div class="testimonial-author">
+                                        <div class="testimonial-avatar">A</div>
+                                        <div>
+                                            <strong>Anita Thomas</strong>
+                                            <span class="testimonial-role">🍱 Event Organizer</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% } %>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="section cta-section">
+        <div class="container">
+            <div class="cta-card">
+                <h2>Ready to Make a Difference?</h2>
+                <p>Join Food Flux today and help reduce food waste in your community.</p>
+                <div class="cta-actions">
+                    <a href="/auth/register" class="btn btn-primary btn-lg">Create Account</a>
+                    <a href="/auth/login" class="btn btn-outline btn-lg">Login</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <%- include('layout/footer') %>

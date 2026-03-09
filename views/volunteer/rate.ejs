@@ -1,0 +1,99 @@
+<%- include('../layout/header') %>
+
+    <section class="dashboard">
+        <div class="container" style="max-width: 600px;">
+            <div class="card" style="margin-top: 2rem;">
+                <div class="card-header" style="text-align: center;">
+                    <h2>Rate Your Experience</h2>
+                    <p style="color: var(--text-muted); margin-top: 5px;">
+                        How was the pickup from <strong>
+                            <%= transaction.donor.restaurantName || transaction.donor.name %>
+                        </strong>?
+                    </p>
+                    <div style="margin-top: 15px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
+                        <span style="font-size: 0.9em;">Food Listing:</span>
+                        <strong style="color: var(--primary-color);">
+                            <%= transaction.listing.foodName %>
+                        </strong>
+                    </div>
+                </div>
+
+                <div class="card-body" style="padding: 30px 20px;">
+                    <form action="/volunteer/rate/<%= transaction._id %>" method="POST">
+
+                        <div class="form-group" style="text-align: center; margin-bottom: 30px;">
+                            <label>Trust Score (1-5 Stars)</label>
+                            <div
+                                style="display: flex; justify-content: center; gap: 10px; font-size: 2rem; margin-top: 10px; flex-direction: row-reverse;">
+                                <!-- CSS pure CSS star rating logic -->
+                                <input type="radio" id="star5" name="rating" value="5" required
+                                    style="display: none;" />
+                                <label for="star5" style="cursor: pointer; transition: 0.2s;"
+                                    onmouseover="highlightStars(5)" onmouseout="resetStars()"
+                                    onclick="setRating(5)">☆</label>
+
+                                <input type="radio" id="star4" name="rating" value="4" style="display: none;" />
+                                <label for="star4" style="cursor: pointer; transition: 0.2s;"
+                                    onmouseover="highlightStars(4)" onmouseout="resetStars()"
+                                    onclick="setRating(4)">☆</label>
+
+                                <input type="radio" id="star3" name="rating" value="3" style="display: none;" />
+                                <label for="star3" style="cursor: pointer; transition: 0.2s;"
+                                    onmouseover="highlightStars(3)" onmouseout="resetStars()"
+                                    onclick="setRating(3)">☆</label>
+
+                                <input type="radio" id="star2" name="rating" value="2" style="display: none;" />
+                                <label for="star2" style="cursor: pointer; transition: 0.2s;"
+                                    onmouseover="highlightStars(2)" onmouseout="resetStars()"
+                                    onclick="setRating(2)">☆</label>
+
+                                <input type="radio" id="star1" name="rating" value="1" style="display: none;" />
+                                <label for="star1" style="cursor: pointer; transition: 0.2s;"
+                                    onmouseover="highlightStars(1)" onmouseout="resetStars()"
+                                    onclick="setRating(1)">☆</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="comment">Additional Comments (Optional)</label>
+                            <textarea id="comment" name="comment" class="form-control" rows="3"
+                                placeholder="Food was packaged well, donor was friendly, etc..."></textarea>
+                        </div>
+
+                        <div style="display: flex; gap: 15px; margin-top: 30px;">
+                            <a href="/volunteer" class="btn btn-secondary" style="flex: 1; text-align: center;">Skip for
+                                Now</a>
+                            <button type="submit" class="btn btn-primary" style="flex: 2;">Submit Rating</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Simple JS for Star Rating Hover Effects -->
+    <script>
+        let currentRating = 0;
+
+        function highlightStars(count) {
+            for (let i = 1; i <= 5; i++) {
+                const label = document.querySelector(`label[for=star${i}]`);
+                if (i <= count) {
+                    label.innerHTML = '⭐';
+                } else {
+                    label.innerHTML = '☆';
+                }
+            }
+        }
+
+        function resetStars() {
+            highlightStars(currentRating);
+        }
+
+        function setRating(count) {
+            currentRating = count;
+            highlightStars(count);
+        }
+    </script>
+
+    <%- include('../layout/footer') %>

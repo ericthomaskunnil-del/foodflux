@@ -1,0 +1,75 @@
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4><span class="logo-icon">🍽️</span> Food Flux</h4>
+                <p>Reducing food waste, one meal at a time. Connecting surplus food with those who need it most.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <a href="/">Home</a>
+                <a href="/auth/login">Login</a>
+                <a href="/auth/register">Register</a>
+            </div>
+            <div class="footer-col">
+                <h4>Roles</h4>
+                <a href="/auth/login">Donor</a>
+                <a href="/auth/login">Volunteer</a>
+                <a href="/auth/login">Admin</a>
+            </div>
+            <div class="footer-col">
+                <h4>Developer</h4>
+                <p style="margin-bottom: 8px;"><strong>Eric Thomas</strong></p>
+                <div style="display: flex; gap: 12px; margin-top: 8px;">
+                    <a href="https://www.linkedin.com/in/eric-thomas-59412a31b?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
+                        target="_blank" style="font-size: 1.2rem;" title="LinkedIn">🔗</a>
+                    <a href="https://www.instagram.com/itz_erixxc?igsh=NTRvdmJ6Z25wYnlq" target="_blank"
+                        style="font-size: 1.2rem;" title="Instagram">📸</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Food Flux — Localised Food Surplus Distribution System</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/js/silk.js"></script>
+<script src="/js/orb.js"></script>
+<script src="/js/charts.js"></script>
+<script>
+    // Toast auto-dismiss
+    const toast = document.getElementById('toast');
+    if (toast) {
+        setTimeout(() => toast.classList.add('show'), 100);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 400);
+        }, 4000);
+    }
+
+    // Mobile nav toggle
+    const navToggle = document.getElementById('navToggle');
+    const navMenu = document.getElementById('navMenu');
+    if (navToggle) {
+        navToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            navToggle.classList.toggle('active');
+        });
+    }
+
+    // Confirmation modals
+    function confirmAction(message, formId) {
+        if (confirm(message)) {
+            document.getElementById(formId).submit();
+        }
+    }
+</script>
+</body>
+
+</html>

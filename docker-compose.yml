@@ -1,0 +1,37 @@
+services:
+  # MongoDB Database Service
+  mongo:
+    image: mongo:6
+    container_name: lfds-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - lfds-network
+
+  # Node.js Application Service
+  app:
+    build: .
+    container_name: lfds-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - MONGODB_URI=mongodb://mongo:27017/lfds
+      - SESSION_SECRET=lfds_super_secret_session_key_2024
+      - NODE_ENV=production
+    depends_on:
+      - mongo
+    networks:
+      - lfds-network
+
+volumes:
+  mongo-data:
+
+
+networks:
+  lfds-network:
+    driver: bridge

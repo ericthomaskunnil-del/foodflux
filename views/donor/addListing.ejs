@@ -1,0 +1,71 @@
+<%- include('../layout/header') %>
+
+    <section class="dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <div>
+                    <h1>
+                        <%= listing ? 'Edit Listing' : 'Add Food Listing' %>
+                    </h1>
+                    <p>
+                        <%= listing ? 'Update your food listing details' : 'Share your surplus food with the community'
+                            %>
+                    </p>
+                </div>
+                <a href="/donor" class="btn btn-outline">← Back</a>
+            </div>
+
+            <div class="card form-card">
+                <form action="<%= listing ? '/donor/edit/' + listing._id : '/donor/add' %>" method="POST"
+                    class="listing-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="foodName">Food Name *</label>
+                            <input type="text" id="foodName" name="foodName"
+                                placeholder="e.g. Biryani, Sandwiches, Fruit Platter"
+                                value="<%= listing ? listing.foodName : '' %>" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="quantity">Quantity *</label>
+                            <input type="text" id="quantity" name="quantity" placeholder="e.g. 25 servings, 10 kg"
+                                value="<%= listing ? listing.quantity : '' %>" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="pickupTime">Pickup Time *</label>
+                            <input type="text" id="pickupTime" name="pickupTime" placeholder="e.g. 6:00 PM - 8:00 PM"
+                                value="<%= listing ? listing.pickupTime : '' %>" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="expiryTime">Expiry Time *</label>
+                            <input type="text" id="expiryTime" name="expiryTime" placeholder="e.g. 10:00 PM Today"
+                                value="<%= listing ? listing.expiryTime : '' %>" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location">Pickup Location *</label>
+                        <input type="text" id="location" name="location" placeholder="Full address for pickup"
+                            value="<%= listing ? listing.location : '' %>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description (Optional)</label>
+                        <textarea id="description" name="description" rows="3"
+                            placeholder="Additional details about the food, packaging, etc."><%= listing ? listing.description : '' %></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <%= listing ? 'Update Listing' : 'Add Listing' %>
+                        </button>
+                        <a href="/donor" class="btn btn-outline">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <%- include('../layout/footer') %>

@@ -1,0 +1,350 @@
+<%- include('../layout/header') %>
+
+    <style>
+        .chat-container {
+            display: flex;
+            height: 70vh;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin-top: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-sidebar {
+            width: 300px;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .threads-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .thread-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .thread-item:hover,
+        .thread-item.active {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .thread-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .thread-info {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .thread-name {
+            margin: 0 0 5px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .thread-preview {
+            margin: 0;
+            font-size: 0.85em;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .unread-badge {
+            background: var(--accent-color);
+            color: white;
+            font-size: 0.75em;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            line-height: 1.4;
+        }
+
+        .message.sent {
+            align-self: flex-end;
+            background: var(--primary-color);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.received {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom-left-radius: 5px;
+        }
+
+        .chat-input-area {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: white;
+            border-radius: 20px;
+            padding: 10px 20px;
+            outline: none;
+        }
+
+        .chat-input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .empty-chat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-muted);
+        }
+    </style>
+
+    <div class="container">
+        <div class="chat-container">
+            <!-- Sidebar: Threads -->
+            <div class="chat-sidebar">
+                <div class="sidebar-header">
+                    <h2 style="font-size: 1.2rem; margin: 0;">Messages</h2>
+                </div>
+                <div class="threads-list" id="threadsList">
+                    <div style="padding: 20px; text-align: center; color: var(--text-muted);">Loading...</div>
+                </div>
+            </div>
+
+            <!-- Main Chat Area -->
+            <div class="chat-main" id="chatMain">
+                <div class="empty-chat" id="emptyChat">
+                    <span style="font-size: 3rem; margin-bottom: 10px;">💬</span>
+                    <h3>Select a conversation</h3>
+                    <p>Choose a thread from the sidebar to view messages.</p>
+                </div>
+
+                <div style="display: none; height: 100%; flex-direction: column;" id="activeChat">
+                    <div class="chat-header">
+                        <h2 style="font-size: 1.2rem; margin: 0;" id="chatHeaderName">User Name</h2>
+                    </div>
+                    <div class="chat-messages" id="messagesList">
+                        <!-- Messages go here -->
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" class="chat-input" id="messageInput" placeholder="Type a message..."
+                            autocomplete="off">
+                        <button class="btn btn-primary" id="sendBtn"
+                            style="border-radius: 20px; padding: 10px 25px;">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Socket.io connection -->
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        const currentUserId = '<%= user.id %>';
+        let currentThreadId = null;
+
+        const threadsList = document.getElementById('threadsList');
+        const emptyChat = document.getElementById('emptyChat');
+        const activeChat = document.getElementById('activeChat');
+        const chatHeaderName = document.getElementById('chatHeaderName');
+        const messagesList = document.getElementById('messagesList');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        // Initialize Socket
+        const socket = io();
+        socket.emit('joinRoom', currentUserId);
+
+        // Fetch and render threads
+        async function fetchThreads() {
+            try {
+                const res = await fetch('/messages/api/threads');
+                const data = await res.json();
+
+                if (data.threads.length === 0) {
+                    threadsList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted);">No messages yet</div>';
+                    return;
+                }
+
+                threadsList.innerHTML = '';
+                data.threads.forEach(thread => {
+                    const user = thread.user;
+                    const activeClass = currentThreadId === user._id ? 'active' : '';
+                    const unreadBadge = thread.unreadCount > 0 ? `<span class="unread-badge">${thread.unreadCount}</span>` : '';
+
+                    const initial = user.name ? user.name.charAt(0).toUpperCase() : '?';
+
+                    const div = document.createElement('div');
+                    div.className = `thread-item ${activeClass}`;
+                    div.innerHTML = `
+                    <div class="thread-avatar">${initial}</div>
+                    <div class="thread-info">
+                        <p class="thread-name">${user.name}</p>
+                        <p class="thread-preview">${thread.lastMessage.content}</p>
+                    </div>
+                    ${unreadBadge}
+                `;
+
+                    div.addEventListener('click', () => openThread(user._id, user.name));
+                    threadsList.appendChild(div);
+                });
+            } catch (err) {
+                console.error('Error fetching threads:', err);
+            }
+        }
+
+        // Open a thread
+        async function openThread(userId, userName) {
+            currentThreadId = userId;
+            emptyChat.style.display = 'none';
+            activeChat.style.display = 'flex';
+            chatHeaderName.textContent = userName;
+
+            // Highlight active thread
+            document.querySelectorAll('.thread-item').forEach(item => item.classList.remove('active'));
+            fetchThreads(); // Re-render to clear unread badge
+
+            await fetchMessages();
+        }
+
+        // Fetch messages for active thread (initial load when opening)
+        async function fetchMessages() {
+            if (!currentThreadId) return;
+            try {
+                const res = await fetch(`/messages/api/thread/${currentThreadId}`);
+                const data = await res.json();
+
+                messagesList.innerHTML = '';
+                data.messages.forEach(msg => {
+                    appendMessageToUI(msg);
+                });
+
+                messagesList.scrollTop = messagesList.scrollHeight;
+            } catch (err) {
+                console.error('Error fetching messages:', err);
+            }
+        }
+
+        // Send a message
+        async function sendMessage() {
+            const content = messageInput.value.trim();
+            if (!content || !currentThreadId) return;
+
+            // Optimistic clearing of input
+            messageInput.value = '';
+
+            try {
+                await fetch('/messages/api/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ receiverId: currentThreadId, content })
+                });
+                // Note: The message will be appended via the Socket.io listener when the server broadcasts it back.
+            } catch (err) {
+                console.error('Error sending message:', err);
+            }
+        }
+
+        function appendMessageToUI(msg) {
+            const isMine = msg.sender._id === currentUserId;
+            const div = document.createElement('div');
+            div.className = `message ${isMine ? 'sent' : 'received'}`;
+            div.textContent = msg.content;
+            messagesList.appendChild(div);
+        }
+
+        // Socket listener for new messages
+        socket.on('newMessage', (msg) => {
+            fetchThreads(); // Update sidebar preview text
+
+            // Only append to chat if it belongs to the currently active thread
+            if (
+                currentThreadId &&
+                (msg.sender._id === currentThreadId || msg.receiver._id === currentThreadId)
+            ) {
+                // If it's a message from the other person, we should immediately mark it as read on the backend (optional enhancement, here we just show it)
+                const isScrolledToBottom = messagesList.scrollHeight - messagesList.clientHeight <= messagesList.scrollTop + 50;
+
+                appendMessageToUI(msg);
+
+                if (isScrolledToBottom || msg.sender._id === currentUserId) {
+                    messagesList.scrollTop = messagesList.scrollHeight;
+                }
+            }
+        });
+
+        sendBtn.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // Initial load
+        fetchThreads();
+
+    </script>
+
+    <%- include('../layout/footer') %>
