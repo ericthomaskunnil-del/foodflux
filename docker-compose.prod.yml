@@ -1,0 +1,36 @@
+services:
+  mongo:
+    image: mongo:6
+    container_name: lfds-mongo-prod
+    restart: unless-stopped
+    # No ports exposed to the host for security
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - lfds-network
+
+  app:
+    build: .
+    container_name: lfds-app-prod
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - MONGODB_URI=mongodb://mongo:27017/lfds
+      - SESSION_SECRET=${SESSION_SECRET}
+      - NODE_ENV=production
+      - GMAIL_USER=${GMAIL_USER}
+      - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD}
+    depends_on:
+      - mongo
+    networks:
+      - lfds-network
+
+volumes:
+  mongo-data:
+
+
+networks:
+  lfds-network:
+    driver: bridge
