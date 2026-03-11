@@ -26,9 +26,15 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['admin', 'donor', 'volunteer'],
+        enum: ['admin', 'donor', 'volunteer', 'corporate_partner'],
         required: [true, 'Role is required']
     },
+    // --- Phase 3: Partner & Notification Fields ---
+    businessName: { type: String, default: '' },
+    businessAddress: { type: String, default: '' },
+    businessType: { type: String, default: '' },
+    dailySurplusEstimate: { type: String, default: '' },
+    fcmTokens: { type: [String], default: [] },
     phone: {
         type: String,
         default: ''
@@ -36,6 +42,20 @@ const userSchema = new mongoose.Schema({
     address: {
         type: String,
         default: ''
+    },
+    // --- Phase 3: Volunteer Verification ---
+    isVerifiedVolunteer: {
+        type: Boolean,
+        default: false
+    },
+    verificationStatus: {
+        type: String,
+        enum: ['none', 'pending', 'approved', 'rejected'],
+        default: 'none'
+    },
+    verificationDocuments: {
+        type: [String], // URLs or file paths
+        default: []
     },
 
     // --- Phase 2: Restaurant & Trust Fields (Primarily for Donors) ---

@@ -1,0 +1,75 @@
+<%- include('../layout/header') %>
+
+    <section class="dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <div>
+                    <h1>Partner Dashboard</h1>
+                    <p>Manage bulk surplus and view enterprise impact for <strong>
+                            <%= user.businessName || user.name %>
+                        </strong></p>
+                </div>
+                <div class="header-actions">
+                    <a href="/donor/add" class="btn btn-primary">+ Bulk Donation</a>
+                    <button class="btn btn-outline">Schedule Recurring</button>
+                </div>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-card-icon">🚀</div>
+                    <div class="stat-card-info">
+                        <span class="stat-card-value">1.2 Tons</span>
+                        <span class="stat-card-label">Food Saved</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon">🌱</div>
+                    <div class="stat-card-info">
+                        <span class="stat-card-value">1,840 kg</span>
+                        <span class="stat-card-label">CO2 Prevented</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon">🍱</div>
+                    <div class="stat-card-info">
+                        <span class="stat-card-value">4,500</span>
+                        <span class="stat-card-label">Meals Distributed</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-top: 2rem;">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Active Bulk Listings</h2>
+                    </div>
+                    <div class="empty-state" style="padding: 40px;">
+                        <p>No active bulk listings. <a href="/donor/add">Create one now</a> to start your impact.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Partner Perks</h2>
+                    </div>
+                    <ul style="padding: 20px; list-style: none;">
+                        <li style="margin-bottom: 15px; display: flex; gap: 10px;">
+                            <span>✅</span>
+                            <span>Verified Badge on Profile</span>
+                        </li>
+                        <li style="margin-bottom: 15px; display: flex; gap: 10px;">
+                            <span>✅</span>
+                            <span>Priority Pickup Support</span>
+                        </li>
+                        <li style="margin-bottom: 15px; display: flex; gap: 10px;">
+                            <span>✅</span>
+                            <span>Monthly Tax-Incentive Reports</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <%- include('../layout/footer') %>

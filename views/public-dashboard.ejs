@@ -12,11 +12,24 @@
         <!-- Impact Stats -->
         <div class="dashboard-stats"
             style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px;">
-            <div class="stat-card">
-                <div class="stat-value">
-                    <%= stats.totalListings %>
+            <div class="stat-card"
+                style="background: rgba(var(--primary-rgb), 0.1); border: 1px solid var(--primary-color);">
+                <div class="stat-value" style="color: var(--primary-color);">
+                    <%= stats.mealsSaved || 0 %>
                 </div>
-                <div class="stat-label">Food Listings Created</div>
+                <div class="stat-label">Meals Saved</div>
+            </div>
+            <div class="stat-card" style="background: rgba(46, 204, 113, 0.1); border: 1px solid #2ecc71;">
+                <div class="stat-value" style="color: #27ae60;">
+                    <%= stats.co2Saved || 0 %> kg
+                </div>
+                <div class="stat-label">CO2 Prevented</div>
+            </div>
+            <div class="stat-card" style="background: rgba(52, 152, 219, 0.1); border: 1px solid #3498db;">
+                <div class="stat-value" style="color: #2980b9;">
+                    <%= (stats.waterSaved / 1000).toFixed(1) || 0 %> m³
+                </div>
+                <div class="stat-label">Water Saved</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value">
@@ -24,17 +37,27 @@
                 </div>
                 <div class="stat-label">Successful Pickups</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value">
+        </div>
+
+        <div class="dashboard-stats"
+            style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; opacity: 0.8; font-size: 0.9rem;">
+            <div class="stat-card" style="padding: 15px;">
+                <div class="stat-value" style="font-size: 1.5rem;">
+                    <%= stats.totalListings %>
+                </div>
+                <div class="stat-label">Total Listings</div>
+            </div>
+            <div class="stat-card" style="padding: 15px;">
+                <div class="stat-value" style="font-size: 1.5rem;">
                     <%= stats.totalDonors %>
                 </div>
                 <div class="stat-label">Active Donors</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value">
+            <div class="stat-card" style="padding: 15px;">
+                <div class="stat-value" style="font-size: 1.5rem;">
                     <%= stats.totalVolunteers %>
                 </div>
-                <div class="stat-label">Registered Volunteers</div>
+                <div class="stat-label">Volunteers</div>
             </div>
         </div>
 

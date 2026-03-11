@@ -50,20 +50,30 @@
                 <% if (typeof user !=='undefined' && user) { %>
                   <a href="/dashboard" class="nav-link">Impact</a>
                   <a href="/<%= user.role %>" class="nav-link">Dashboard</a>
-                  <% if (user.role==='volunteer' ) { %>
-                    <a href="/volunteer/directory" class="nav-link">Directory</a>
+                  <% if (user.role==='admin' ) { %>
+                    <a href="/admin/analytics" class="nav-link">Analytics</a>
                     <% } %>
-                      <a href="/messages" class="nav-link">Messages</a>
-                      <span class="nav-badge">
-                        <%= user.role %>
-                      </span>
-                      <a href="/auth/logout" class="nav-link nav-logout">Logout</a>
-                      <% } else { %>
-                        <a href="/" class="nav-link">Home</a>
-                        <a href="/dashboard" class="nav-link">Impact Dashboard</a>
-                        <a href="/auth/login" class="nav-link">Login</a>
-                        <a href="/auth/register" class="btn btn-nav">Get Started</a>
+                      <% if (user.role==='volunteer' ) { %>
+                        <a href="/volunteer/directory" class="nav-link">Directory</a>
                         <% } %>
+                          <a href="/messages" class="nav-link">Messages</a>
+                          <span class="nav-badge">
+                            <%= user.role %>
+                          </span>
+                          <a href="/auth/logout" class="nav-link nav-logout">Logout</a>
+                          <% } else { %>
+                            <a href="/" class="nav-link">Home</a>
+                            <a href="/dashboard" class="nav-link">Impact Dashboard</a>
+                            <a href="/auth/login" class="nav-link">Login</a>
+                            <% } %>
+                              <button class="theme-toggle" id="themeToggle" title="Toggle Dark/Light Mode"
+                                aria-label="Toggle Dark/Light Mode">
+                                <span class="sun-icon">☀️</span>
+                                <span class="moon-icon">🌙</span>
+                              </button>
+                              <% if (typeof user==='undefined' || !user) { %>
+                                <a href="/auth/register" class="btn btn-nav">Get Started</a>
+                                <% } %>
               </div>
             </div>
           </nav>

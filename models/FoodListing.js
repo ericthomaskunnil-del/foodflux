@@ -59,6 +59,46 @@ const foodListingSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         default: null
+    },
+
+    // --- Phase 3: Food Safety Compliance ---
+    foodType: {
+        type: String,
+        enum: ['Veg', 'Non-Veg', 'Mixed'],
+        default: 'Veg'
+    },
+    preparedTime: {
+        type: Date,
+        required: [true, 'Preparation time is required']
+    },
+    storageMethod: {
+        type: String,
+        enum: ['Room Temperature', 'Refrigerated', 'Frozen'],
+        default: 'Room Temperature'
+    },
+    allergens: {
+        type: [String],
+        default: []
+    },
+    servingsAvailable: {
+        type: Number,
+        required: [true, 'Number of servings is required'],
+        min: 1
+    },
+
+    // --- Phase 3: QR Code Verification ---
+    pickupCode: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
+    pickupVerified: {
+        type: Boolean,
+        default: false
+    },
+    actualPickupTime: {
+        type: Date,
+        default: null
     }
 }, {
     timestamps: true

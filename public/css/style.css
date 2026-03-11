@@ -43,6 +43,25 @@
   --transition-fast: all 0.15s ease;
 }
 
+/* Light Theme Variables */
+:root[data-theme='light'] {
+  --bg-primary: #f8f9fa;
+  --bg-secondary: #ffffff;
+  --bg-card: rgba(0, 0, 0, 0.03);
+  --bg-card-hover: rgba(0, 0, 0, 0.06);
+  --bg-glass: rgba(0, 0, 0, 0.04);
+  --bg-glass-strong: rgba(0, 0, 0, 0.08);
+
+  --text-primary: #1a1a2e;
+  --text-secondary: #4a4a68;
+  --text-muted: #71718a;
+
+  --border-color: rgba(0, 0, 0, 0.08);
+  --border-light: rgba(0, 0, 0, 0.12);
+
+  --accent-gradient-soft: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(168, 85, 247, 0.1));
+}
+
 /* ─── Reset & Base ──────────────────────────────────────────────────── */
 *,
 *::before,
@@ -185,6 +204,45 @@ img {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+/* Theme Toggle */
+.theme-toggle {
+  background: var(--bg-glass);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 1.1rem;
+  margin-left: 8px;
+}
+
+.theme-toggle:hover {
+  background: var(--bg-glass-strong);
+  transform: translateY(-2px);
+  border-color: var(--accent-primary);
+}
+
+.theme-toggle .sun-icon {
+  display: none;
+}
+
+.theme-toggle .moon-icon {
+  display: block;
+}
+
+:root[data-theme='light'] .theme-toggle .sun-icon {
+  display: block;
+}
+
+:root[data-theme='light'] .theme-toggle .moon-icon {
+  display: none;
 }
 
 .nav-link {

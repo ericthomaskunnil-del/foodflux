@@ -9,6 +9,31 @@
                 </div>
             </div>
 
+            <!-- Phase 3: Volunteer Verification Status -->
+            <div class="card"
+                style="margin-bottom: 2rem; background: var(--bg-glass); border: 1px solid var(--border-color);">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px;">
+                    <div>
+                        <h2 style="font-size: 1.2rem; margin-bottom: 5px;">Verification Status</h2>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary);">Verified volunteers get priority for
+                            urgent pickups.</p>
+                    </div>
+                    <div>
+                        <% if (user.isVerifiedVolunteer) { %>
+                            <span class="badge" style="background: #2ecc71; color: white; padding: 8px 16px;">🛡️
+                                Verified Volunteer</span>
+                            <% } else if (user.verificationStatus==='pending' ) { %>
+                                <span class="badge" style="background: #f1c40f; color: black; padding: 8px 16px;">⏳
+                                    Verification Pending</span>
+                                <% } else { %>
+                                    <form action="/volunteer/request-verification" method="POST">
+                                        <button type="submit" class="btn btn-primary">Request Verification</button>
+                                    </form>
+                                    <% } %>
+                    </div>
+                </div>
+            </div>
+
             <!-- Live Map Area -->
             <div class="card"
                 style="margin-bottom: 2rem; padding: 0; overflow: hidden; border: 1px solid var(--border-color);">
@@ -100,6 +125,46 @@
                                             <span class="detail-icon">⏰</span>
                                             <span>Expires: <%= listing.expiryTime %></span>
                                         </div>
+
+                                        <!-- Phase 3: Food Safety Info -->
+                                        <div
+                                            style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border-color); font-size: 0.85rem;">
+                                            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px;">
+                                                <span class="badge"
+                                                    style="background: var(--bg-glass); border: 1px solid var(--border-color); color: var(--text-primary);">
+                                                    <%= listing.foodType %>
+                                                </span>
+                                                <span class="badge"
+                                                    style="background: var(--bg-glass); border: 1px solid var(--border-color); color: var(--text-primary);">
+                                                    ❄️ <%= listing.storageMethod %>
+                                                </span>
+                                            </div>
+
+                                            <% const prepared=new Date(listing.preparedTime); const
+                                                hoursSincePrepared=(new Date() - prepared) / (1000 * 60 * 60); let
+                                                isUnsafe=false; if (listing.storageMethod==='Room Temperature' &&
+                                                hoursSincePrepared> 4) isUnsafe = true;
+                                                if (listing.storageMethod === 'Refrigerated' && hoursSincePrepared > 24)
+                                                isUnsafe = true;
+                                                %>
+
+                                                <p style="margin-bottom: 4px;"><strong>Prepared:</strong>
+                                                    <%= prepared.toLocaleString([], {month: 'short' , day: 'numeric' ,
+                                                        hour: '2-digit' , minute: '2-digit' }) %>
+                                                </p>
+
+                                                <% if (listing.allergens && listing.allergens.length> 0) { %>
+                                                    <p style="margin-bottom: 4px; color: #d63031;"><strong>⚠️
+                                                            Allergens:</strong>
+                                                        <%= listing.allergens.join(', ') %></p>
+                                            <% } %>
+
+                                            <% if (isUnsafe) { %>
+                                                <div class="badge" style="background: #fab1a0; color: #d63031; border: 1px solid #ff7675; display: block; text-align: center; margin-top: 8px;">
+                                                    ⚠️ Food Safety Warning: Consuming after 4h at RT is risky
+                                                </div>
+                                            <% } %>
+                                        </div>
                                         <% if (listing.description) { %>
                                             <p class="listing-description">
                                                 <%= listing.description %>
@@ -107,9 +172,9 @@
                                             <% } %>
                                                 <div class="listing-donor">
                                                     <span>Posted by: <strong>
-                                                            <%= listing.donor ? listing.donor.name : 'Unknown' %>
-                                                        </strong></span>
-                                                </div>
+                                                            <%= listing.donor ? listing.donor.name : ' Unknown' %>
+                                                            </strong></span>
+                                        </div>
                                     </div>
                                     <div class="listing-card-footer">
                                         <form action="/volunteer/accept/<%= listing._id %>" method="POST"
@@ -170,8 +235,12 @@
                                                         Mark Collected
                                                     </button>
                                                 </form>
+                                                <button type="button" class="btn btn-sm btn-nav"
+                                                    style="margin-top: 5px;" onclick="openScanner('<%= pickup._id %>')">
+                                                    🛡️ Secure Verify
+                                                </button>
                                                 <% } else { %>
-                                                    <span class="text-muted">Done ✓</span>
+                                                    <span class="text-muted">Verified ✓</span>
                                                     <% } %>
                                         </td>
                                     </tr>
@@ -183,6 +252,72 @@
                 <% } %>
         </div>
     </section>
+
+    <!-- QR Scanner Modal -->
+    <div id="scannerModal" class="modal"
+        style="display:none; position:fixed; z-index:10001; left:0; top:0; width:100%; height:100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);">
+        <div class="card" style="position:relative; max-width:500px; margin: 50px auto; padding: 20px;">
+            <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+                <h2>Scan Pickup QR</h2>
+                <button onclick="closeScanner()" class="btn btn-sm btn-outline">&times;</button>
+            </div>
+            <div id="reader" style="width:100%; border-radius: var(--radius); overflow:hidden; margin: 20px 0;"></div>
+            <div id="scanner-status" style="text-align:center; padding: 10px; color: var(--text-secondary);">
+                Align the donor's QR code within the frame
+            </div>
+            <form id="manualVerifyForm" method="POST"
+                style="margin-top:20px; border-top:1px solid var(--border-color); padding-top:20px;">
+                <p style="margin-bottom:10px; font-size: 0.9rem;">Or enter code manually:</p>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" name="pickupCode" id="manualCode" placeholder="HEX CODE" required
+                        style="flex:1;">
+                    <button type="submit" class="btn btn-primary">Verify</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scanner Dependencies & Script -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script>
+        let html5QrCode;
+        let currentTransactionId;
+
+        function openScanner(transactionId) {
+            currentTransactionId = transactionId;
+            document.getElementById('scannerModal').style.display = 'block';
+            document.getElementById('manualVerifyForm').action = `/volunteer/verify-pickup/${transactionId}`;
+
+            html5QrCode = new Html5Qrcode("reader");
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+            html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
+                .catch(err => {
+                    console.error("Scanner start error:", err);
+                    document.getElementById('scanner-status').innerHTML = "⚠️ Camera permisson required for scanning";
+                });
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            // Stop scanner
+            html5QrCode.stop().then(() => {
+                // Fill manual code field and submit form
+                document.getElementById('manualCode').value = decodedText;
+                document.getElementById('manualVerifyForm').submit();
+            });
+        }
+
+        function closeScanner() {
+            if (html5QrCode && html5QrCode.isScanning) {
+                html5QrCode.stop().then(() => {
+                    document.getElementById('scannerModal').style.display = 'none';
+                });
+            } else {
+                document.getElementById('scannerModal').style.display = 'none';
+            }
+        }
+    </script>
+
 
     <!-- Leaflet Map Initialization Script -->
     <script>

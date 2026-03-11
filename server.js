@@ -17,6 +17,7 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 const PORT = process.env.PORT || 3000;
+console.log("GMAIL USER:", process.env.GMAIL_USER);
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/lfds';
 
 // ─── View Engine Setup ───────────────────────────────────────────────
@@ -121,9 +122,23 @@ app.get('/dashboard', async (req, res) => {
       { $unwind: "$volunteerDetails" }
     ]);
 
+    // Calculate Environmental Impact (CO2 prevented, Water saved)
+    // Avg 2kg CO2 per kg food, 1000L water per kg. Avg listing 5kg.
+    const mealsSaved = completedPickups * 2; // Roughly 2 meals per kg, or just a simple multiplier
+    const co2Saved = completedPickups * 5 * 2; // Using 5kg avg per pickup
+    const waterSaved = completedPickups * 5 * 1000;
+
     res.render('public-dashboard', {
       title: 'Global Impact Dashboard | Food Flux',
-      stats: { totalDonors, totalVolunteers, totalListings, completedPickups },
+      stats: {
+        totalDonors,
+        totalVolunteers,
+        totalListings,
+        completedPickups,
+        mealsSaved,
+        co2Saved,
+        waterSaved
+      },
       topDonors,
       topVolunteers
     });

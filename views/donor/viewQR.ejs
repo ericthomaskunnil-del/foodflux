@@ -1,0 +1,38 @@
+<%- include('../layout/header') %>
+
+    <section class="dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <div>
+                    <h1>Pickup Verification QR</h1>
+                    <p>Show this code to the volunteer at the time of pickup</p>
+                </div>
+                <a href="/donor" class="btn btn-outline">← Back</a>
+            </div>
+
+            <div class="card" style="max-width: 500px; margin: 0 auto; text-align: center; padding: 40px;">
+                <h2 style="margin-bottom: 20px;">
+                    <%= listing.foodName %>
+                </h2>
+                <div
+                    style="background: white; padding: 20px; border-radius: 12px; display: inline-block; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                    <img src="<%= qrDataUri %>" alt="Pickup QR Code" style="width: 250px; height: 250px;">
+                </div>
+
+                <div
+                    style="text-align: left; background: var(--bg-glass); padding: 20px; border-radius: var(--radius); border: 1px solid var(--border-color);">
+                    <p style="margin-bottom: 10px;"><strong>Verification Code:</strong> <code
+                            style="background: var(--bg-secondary); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border-color);"><%= listing.pickupCode %></code>
+                    </p>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary);">The volunteer will scan this code to
+                        securely confirm they have received the items.</p>
+                </div>
+
+                <div style="margin-top: 32px;">
+                    <button onclick="window.print()" class="btn btn-outline" style="width: 100%;">Print QR Code</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <%- include('../layout/footer') %>

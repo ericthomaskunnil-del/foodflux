@@ -15,5 +15,6 @@ router.post('/add', isDonor, donorController.postAddListing);
 router.get('/edit/:id', isDonor, donorController.getEditListing);
 router.post('/edit/:id', isDonor, donorController.postEditListing);
 router.post('/delete/:id', isDonor, donorController.deleteListing);
+router.get('/qr/:id', isDonor, donorController.getPickupQR);
 
 module.exports = router;

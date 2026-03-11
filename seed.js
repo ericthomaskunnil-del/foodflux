@@ -9,10 +9,11 @@ const Transaction = require('./models/Transaction');
 
 const Review = require('./models/Review');
 const Message = require('./models/Message');
+const crypto = require('crypto');
 
 async function seedDatabase() {
     try {
-        console.log('🌱 Clearing and seeding database for Phase 2 demo...');
+        console.log('🌱 Clearing and seeding database...');
 
         // Clear existing data to force fresh seed
         await User.deleteMany({});
@@ -52,10 +53,15 @@ async function seedDatabase() {
             password: 'volunteer123',
             role: 'volunteer',
             phone: '+91 98765 43212',
-            address: '88 Service Lane, Kochi'
+            address: '88 Service Lane, Kochi',
+            isVerifiedVolunteer: true,
+            verificationStatus: 'approved'
         });
 
         // ─── Create Food Listings ─────────────────────────────────────
+        const pickupCode1 = crypto.randomBytes(4).toString('hex').toUpperCase();
+        const pickupCode2 = crypto.randomBytes(4).toString('hex').toUpperCase();
+
         const listing1 = await FoodListing.create({
             foodName: 'Biryani & Rice Bowls',
             quantity: '25 servings',
@@ -66,7 +72,15 @@ async function seedDatabase() {
             status: 'completed',
             approved: true,
             donor: donor._id,
-            volunteer: volunteer._id
+            volunteer: volunteer._id,
+            foodType: 'Mixed',
+            preparedTime: new Date(Date.now() - 3600000 * 6), // 6 hours ago
+            storageMethod: 'Room Temperature',
+            allergens: ['Nuts', 'Dairy'],
+            servingsAvailable: 25,
+            pickupCode: pickupCode1,
+            pickupVerified: true,
+            actualPickupTime: new Date(Date.now() - 3600000 * 4)
         });
 
         const listing2 = await FoodListing.create({
@@ -79,7 +93,15 @@ async function seedDatabase() {
             status: 'completed',
             approved: true,
             donor: donor._id,
-            volunteer: volunteer._id
+            volunteer: volunteer._id,
+            foodType: 'Mixed',
+            preparedTime: new Date(Date.now() - 3600000 * 8), // 8 hours ago
+            storageMethod: 'Refrigerated',
+            allergens: ['Gluten', 'Eggs'],
+            servingsAvailable: 40,
+            pickupCode: pickupCode2,
+            pickupVerified: true,
+            actualPickupTime: new Date(Date.now() - 3600000 * 5)
         });
 
         const listing3 = await FoodListing.create({
@@ -93,7 +115,12 @@ async function seedDatabase() {
             status: 'available',
             approved: true,
             donor: donor._id,
-            volunteer: null
+            volunteer: null,
+            foodType: 'Veg',
+            preparedTime: new Date(Date.now() - 3600000 * 2), // 2 hours ago
+            storageMethod: 'Room Temperature',
+            allergens: [],
+            servingsAvailable: 30
         });
 
         const listing4 = await FoodListing.create({
@@ -107,7 +134,32 @@ async function seedDatabase() {
             status: 'available',
             approved: true,
             donor: donor._id,
-            volunteer: null
+            volunteer: null,
+            foodType: 'Veg',
+            preparedTime: new Date(Date.now() - 3600000 * 3), // 3 hours ago
+            storageMethod: 'Room Temperature',
+            allergens: ['Gluten', 'Dairy'],
+            servingsAvailable: 20
+        });
+
+        const listing5 = await FoodListing.create({
+            foodName: 'Dal Tadka & Naan',
+            quantity: '15 servings',
+            pickupTime: '7:00 PM - 9:00 PM',
+            location: 'Fresh Bites, MG Road, Kochi',
+            locationCoords: { lat: 9.9312, lng: 76.2673 },
+            expiryTime: '11:00 PM Today',
+            description: 'Dinner surplus — fresh dal tadka with butter naan and jeera rice.',
+            status: 'available',
+            approved: false,
+            isUrgent: true,
+            donor: donor._id,
+            volunteer: null,
+            foodType: 'Veg',
+            preparedTime: new Date(Date.now() - 3600000 * 1), // 1 hour ago
+            storageMethod: 'Room Temperature',
+            allergens: ['Dairy', 'Gluten'],
+            servingsAvailable: 15
         });
 
         // ─── Create Completed Transactions ────────────────────────────
@@ -127,7 +179,7 @@ async function seedDatabase() {
             notes: 'Collected from café. Distributed to children at community center.'
         });
 
-        // ─── Create Mock Database Reviews ─────────────────────────────
+        // ─── Create Mock Reviews ──────────────────────────────────────
         await Review.create({
             reviewer: volunteer._id,
             reviewee: donor._id,
@@ -144,30 +196,98 @@ async function seedDatabase() {
             comment: 'Good food, friendly staff.'
         });
 
-        // ─── Create Mock Messages ─────────────────────────────────────
-        await Message.create({
-            sender: donor._id,
-            receiver: volunteer._id,
-            content: 'Hello Green Earth NGO! We have a large batch of surplus biryani today.',
-            read: true,
-            createdAt: new Date(Date.now() - 3600000 * 2) // 2 hours ago
-        });
+        // ─── Create Sample Messages (all 3 accounts) ─────────────────
+        await Message.insertMany([
+            // Admin ↔ Donor
+            {
+                sender: admin._id,
+                receiver: donor._id,
+                content: 'Welcome to Food Flux! Your business profile has been verified for tax-deductible contributions. Feel free to start posting surplus listings!',
+                read: true,
+                createdAt: new Date(Date.now() - 3600000 * 24 * 5)
+            },
+            {
+                sender: donor._id,
+                receiver: admin._id,
+                content: 'Thank you! We are excited to be part of this initiative. We have surplus food almost daily from our restaurant.',
+                read: true,
+                createdAt: new Date(Date.now() - 3600000 * 24 * 4.9)
+            },
+            {
+                sender: admin._id,
+                receiver: donor._id,
+                content: 'That\'s wonderful to hear! Make sure to set accurate pickup times so volunteers can plan their routes efficiently.',
+                read: true,
+                createdAt: new Date(Date.now() - 3600000 * 24 * 4.8)
+            },
 
-        await Message.create({
-            sender: volunteer._id,
-            receiver: donor._id,
-            content: 'Hi Fresh Bites! That sounds wonderful. We can send a volunteer by 6:30 PM.',
-            read: true,
-            createdAt: new Date(Date.now() - 3600000) // 1 hour ago
-        });
+            // Admin ↔ Volunteer
+            {
+                sender: admin._id,
+                receiver: volunteer._id,
+                content: 'Welcome to Food Flux, Green Earth NGO! Your volunteer account has been verified ✅. You now have priority access to urgent pickups.',
+                read: true,
+                createdAt: new Date(Date.now() - 3600000 * 24 * 4)
+            },
+            {
+                sender: volunteer._id,
+                receiver: admin._id,
+                content: 'Thank you for verifying our account! Our team of 12 volunteers is ready to help. Is there a way to get notified about urgent listings?',
+                read: true,
+                createdAt: new Date(Date.now() - 3600000 * 24 * 3.9)
+            },
+            {
+                sender: admin._id,
+                receiver: volunteer._id,
+                content: 'Absolutely! You\'ll receive real-time notifications on your dashboard and via email when new food is available nearby. Keep an eye on the live map too!',
+                read: true,
+                createdAt: new Date(Date.now() - 3600000 * 24 * 3.8)
+            },
+            {
+                sender: volunteer._id,
+                receiver: admin._id,
+                content: 'I noticed a bug in the map pins on iPhone 12. Should I report this on GitHub?',
+                read: false,
+                createdAt: new Date(Date.now() - 3600000 * 5)
+            },
 
-        await Message.create({
-            sender: donor._id,
-            receiver: volunteer._id,
-            content: 'Perfect, the food is packed and ready. See you soon!',
-            read: false,
-            createdAt: new Date() // Just now
-        });
+            // Donor ↔ Volunteer
+            {
+                sender: donor._id,
+                receiver: volunteer._id,
+                content: 'Hello Green Earth NGO! We have a large batch of surplus biryani today — about 25 servings. Can you send someone by 6 PM?',
+                read: true,
+                createdAt: new Date(Date.now() - 3600000 * 24 * 2)
+            },
+            {
+                sender: volunteer._id,
+                receiver: donor._id,
+                content: 'Hi Fresh Bites! That sounds wonderful. We can send a volunteer by 6:30 PM. Please keep it packed and ready.',
+                read: true,
+                createdAt: new Date(Date.now() - 3600000 * 24 * 1.9)
+            },
+            {
+                sender: donor._id,
+                receiver: volunteer._id,
+                content: 'Perfect, the food is packed and ready at the counter. Ask for the manager when you arrive!',
+                read: true,
+                createdAt: new Date(Date.now() - 3600000 * 24 * 1.8)
+            },
+            {
+                sender: volunteer._id,
+                receiver: donor._id,
+                content: 'Picked up successfully! Distributed all 25 servings at the community shelter. Everyone loved the biryani. Thank you so much! 🙏',
+                read: true,
+                createdAt: new Date(Date.now() - 3600000 * 24 * 1.5)
+            },
+            {
+                sender: donor._id,
+                receiver: volunteer._id,
+                content: 'A new listing "Assorted Bakery Items" is ready. Are you available for pickup tomorrow morning?',
+                read: false,
+                createdAt: new Date()
+            }
+        ]);
 
         console.log('✅ Database seeded successfully');
         console.log('   📧 Admin:     admin@lfds.com / admin123');

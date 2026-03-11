@@ -229,3 +229,49 @@ exports.sendMatchEmail = async (volunteer, listing) => {
         console.error('Error sending match email:', err.message);
     }
 };
+
+// ─── Verification Status Email ───────────────────────────────────────────
+exports.sendVerificationStatusEmail = async (user, status) => {
+    try {
+        const isApproved = status === 'approved';
+        const statusEmoji = isApproved ? '✅' : '❌';
+        const statusColor = isApproved ? '#2ecc71' : '#e74c3c';
+        const statusLabel = isApproved ? 'Approved' : 'Rejected';
+
+        const bodyContent = `
+            <h2 style="margin: 0 0 16px; font-size: 22px; color: #f0f0f5;">Verification ${statusLabel} ${statusEmoji}</h2>
+            <p style="color: #a0a0b8; line-height: 1.7; margin: 0 0 20px;">
+                Hello <strong style="color: #f0f0f5;">${user.name}</strong>, your volunteer verification request has been reviewed.
+            </p>
+            
+            <div style="background: rgba(${isApproved ? '46,204,113' : '231,76,60'},0.08); border: 1px solid rgba(${isApproved ? '46,204,113' : '231,76,60'},0.2); border-radius: 12px; padding: 20px; margin: 24px 0; text-align: center;">
+                <p style="font-size: 48px; margin: 0 0 12px;">${isApproved ? '🛡️' : '📋'}</p>
+                <h3 style="margin: 0 0 8px; font-size: 20px; color: ${statusColor};">Verification ${statusLabel}</h3>
+                <p style="margin: 0; color: #a0a0b8; font-size: 14px;">
+                    ${isApproved
+                        ? 'Congratulations! You are now a verified volunteer and will get priority for urgent pickups.'
+                        : 'Unfortunately, your verification request was not approved at this time. You may re-apply or contact the admin for more details.'
+                    }
+                </p>
+            </div>
+
+            <div style="text-align: center; margin: 28px 0 0;">
+                <a href="http://localhost:${process.env.PORT || 3000}/volunteer" 
+                   style="display: inline-block; padding: 14px 36px; background: linear-gradient(135deg, #6c5ce7, #a855f7); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px;">
+                    Go to Your Dashboard →
+                </a>
+            </div>
+        `;
+
+        await transporter.sendMail({
+            from: FROM_ADDRESS,
+            to: user.email,
+            subject: `Verification ${statusLabel} ${statusEmoji} — Food Flux`,
+            html: wrapInLayout(bodyContent)
+        });
+
+        console.log(`📧 Verification ${status} email sent to:`, user.email);
+    } catch (err) {
+        console.error('Error sending verification status email:', err.message);
+    }
+};

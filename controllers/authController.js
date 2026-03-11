@@ -135,3 +135,24 @@ exports.logout = (req, res) => {
         res.redirect('/');
     });
 };
+// Save FCM token for push notifications
+exports.saveFCMToken = async (req, res) => {
+    try {
+        const { token } = req.body;
+        if (!token) return res.status(400).json({ error: 'Token is required' });
+
+        const user = await User.findById(req.session.user.id);
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        // Add token if it doesn't exist
+        if (!user.fcmTokens.includes(token)) {
+            user.fcmTokens.push(token);
+            await user.save();
+        }
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Save FCM token error:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};

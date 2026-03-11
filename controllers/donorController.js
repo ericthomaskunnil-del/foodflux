@@ -18,8 +18,10 @@ exports.getDashboard = async (req, res) => {
             .populate('volunteer', 'name email')
             .sort({ createdAt: -1 });
 
-        res.render('donor/dashboard', {
-            title: 'Donor Dashboard — Food Flux',
+        const view = req.session.user.role === 'corporate_partner' ? 'partner/dashboard' : 'donor/dashboard';
+
+        res.render(view, {
+            title: req.session.user.role === 'corporate_partner' ? 'Partner Dashboard — Food Flux' : 'Donor Dashboard — Food Flux',
             listings,
             transactions
         });
@@ -41,15 +43,22 @@ exports.getAddListing = (req, res) => {
 // Handle creating a new listing
 exports.postAddListing = async (req, res) => {
     try {
-        const { foodName, quantity, pickupTime, location, expiryTime, description } = req.body;
+        const {
+            foodName, quantity, pickupTime, location, expiryTime, description,
+            foodType, preparedTime, storageMethod, allergens, servingsAvailable
+        } = req.body;
 
         // Validation
-        if (!foodName || !quantity || !pickupTime || !location || !expiryTime) {
+        if (!foodName || !quantity || !pickupTime || !location || !expiryTime || !preparedTime || !servingsAvailable) {
             req.session.error = 'Please fill in all required fields';
             return res.redirect('/donor/add');
         }
 
         const coords = await geocodeAddress(location);
+
+        // Generate preliminary pickup code for Phase 3 QR workflow
+        const crypto = require('crypto');
+        const pickupCode = crypto.randomBytes(4).toString('hex').toUpperCase();
 
         const listing = new FoodListing({
             foodName,
@@ -61,7 +70,14 @@ exports.postAddListing = async (req, res) => {
             description: description || '',
             donor: req.session.user.id,
             status: 'available',
-            approved: false
+            approved: false,
+            // Phase 3 fields
+            foodType: foodType || 'Veg',
+            preparedTime: new Date(preparedTime),
+            storageMethod: storageMethod || 'Room Temperature',
+            allergens: allergens ? (Array.isArray(allergens) ? allergens : allergens.split(',').map(s => s.trim())) : [],
+            servingsAvailable: parseInt(servingsAvailable),
+            pickupCode
         });
 
         await listing.save();
@@ -118,7 +134,10 @@ exports.getEditListing = async (req, res) => {
 // Handle updating a listing
 exports.postEditListing = async (req, res) => {
     try {
-        const { foodName, quantity, pickupTime, location, expiryTime, description } = req.body;
+        const {
+            foodName, quantity, pickupTime, location, expiryTime, description,
+            foodType, preparedTime, storageMethod, allergens, servingsAvailable
+        } = req.body;
 
         const listing = await FoodListing.findOne({
             _id: req.params.id,
@@ -149,6 +168,13 @@ exports.postEditListing = async (req, res) => {
 
         listing.expiryTime = expiryTime;
         listing.description = description || '';
+
+        // Phase 3 fields
+        listing.foodType = foodType || 'Veg';
+        if (preparedTime) listing.preparedTime = new Date(preparedTime);
+        listing.storageMethod = storageMethod || 'Room Temperature';
+        listing.allergens = allergens ? (Array.isArray(allergens) ? allergens : allergens.split(',').map(s => s.trim())) : [];
+        listing.servingsAvailable = parseInt(servingsAvailable);
 
         await listing.save();
         req.session.success = 'Listing updated successfully!';
@@ -188,5 +214,34 @@ exports.deleteListing = async (req, res) => {
         console.error('Delete listing error:', err);
         req.session.error = 'Failed to delete listing';
         return res.redirect('/donor');
+    }
+};
+
+// Generate QR code for pickup verification
+exports.getPickupQR = async (req, res) => {
+    try {
+        const QRCode = require('qrcode');
+        const listing = await FoodListing.findOne({
+            _id: req.params.id,
+            donor: req.session.user.id
+        });
+
+        if (!listing || !listing.pickupCode) {
+            req.session.error = 'Listing or pickup code not found';
+            return res.redirect('/donor');
+        }
+
+        // Generate QR code as Data URI
+        const qrDataUri = await QRCode.toDataURL(listing.pickupCode);
+
+        res.render('donor/viewQR', {
+            title: 'Pickup QR Code — Food Flux',
+            listing,
+            qrDataUri
+        });
+    } catch (err) {
+        console.error('QR generation error:', err);
+        req.session.error = 'Failed to generate QR code';
+        res.redirect('/donor');
     }
 };

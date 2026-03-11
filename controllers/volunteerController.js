@@ -9,6 +9,14 @@ const Transaction = require('../models/Transaction');
 // Volunteer dashboard — show available listings and pickup history
 exports.getDashboard = async (req, res) => {
     try {
+        // Fetch full user data for verification status display
+        const User = require('../models/User');
+        const currentUser = await User.findById(req.session.user.id);
+        if (currentUser) {
+            res.locals.user.isVerifiedVolunteer = currentUser.isVerifiedVolunteer;
+            res.locals.user.verificationStatus = currentUser.verificationStatus;
+        }
+
         // Available approved listings
         const availableListings = await FoodListing.find({
             status: 'available',
@@ -204,6 +212,62 @@ exports.submitRating = async (req, res) => {
     } catch (err) {
         console.error('Submit rating error:', err);
         req.session.error = 'Failed to submit rating';
+        res.redirect('/volunteer');
+    }
+};
+
+// Verify pickup with QR code/manual code
+exports.verifyPickup = async (req, res) => {
+    try {
+        const { pickupCode } = req.body;
+        const transactionId = req.params.transactionId;
+
+        const transaction = await Transaction.findOne({
+            _id: transactionId,
+            volunteer: req.session.user.id
+        }).populate('listing');
+
+        if (!transaction || !transaction.listing) {
+            req.session.error = 'Transaction not found';
+            return res.redirect('/volunteer');
+        }
+
+        if (transaction.listing.pickupCode !== pickupCode) {
+            req.session.error = 'Invalid verification code. Please try again.';
+            return res.redirect('/volunteer');
+        }
+
+        // Success: Mark everything as completed
+        transaction.status = 'completed';
+        await transaction.save();
+
+        const listing = transaction.listing;
+        listing.status = 'completed';
+        listing.pickupVerified = true;
+        listing.actualPickupTime = new Date();
+        await listing.save();
+
+        req.session.success = 'Pickup verified successfully! Thank you for your service.';
+        res.redirect(`/volunteer/rate/${transaction._id}`);
+    } catch (err) {
+        console.error('Verify pickup error:', err);
+        req.session.error = 'Failed to verify pickup';
+        res.redirect('/volunteer');
+    }
+};
+
+// Request verification
+exports.requestVerification = async (req, res) => {
+    try {
+        const User = require('../models/User');
+        await User.findByIdAndUpdate(req.session.user.id, {
+            verificationStatus: 'pending'
+        });
+        req.session.success = 'Verification request submitted! Admin will review your profile.';
+        res.redirect('/volunteer');
+    } catch (err) {
+        console.error('Request verification error:', err);
+        req.session.error = 'Failed to submit request';
         res.redirect('/volunteer');
     }
 };

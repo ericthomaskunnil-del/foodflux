@@ -1,0 +1,126 @@
+<%- include('../layout/header') %>
+
+    <section class="dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <div>
+                    <h1>Impact Analytics</h1>
+                    <p>Community and environmental metrics for Food Flux</p>
+                </div>
+                <a href="/admin" class="btn btn-outline">← Dashboard</a>
+            </div>
+
+            <!-- Impact Overview -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-card-icon">🍱</div>
+                    <div class="stat-card-info">
+                        <span class="stat-card-value">
+                            <%= metrics.totalMeals %>
+                        </span>
+                        <span class="stat-card-label">Meals Saved</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon">🌬️</div>
+                    <div class="stat-card-info">
+                        <span class="stat-card-value">
+                            <%= metrics.co2Saved %> kg
+                        </span>
+                        <span class="stat-card-label">CO2 Prevented</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon">💧</div>
+                    <div class="stat-card-info">
+                        <span class="stat-card-value">
+                            <%= metrics.waterSaved %> L
+                        </span>
+                        <span class="stat-card-label">Water Conserved</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon">📦</div>
+                    <div class="stat-card-info">
+                        <span class="stat-card-value">
+                            <%= metrics.totalPickups %>
+                        </span>
+                        <span class="stat-card-label">Completed Pickups</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid"
+                style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; margin-top: 2rem;">
+                <!-- Community Growth Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Community Growth</h2>
+                    </div>
+                    <div style="padding: 20px;">
+                        <canvas id="communityChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Environmental Impact Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Donation Trends</h2>
+                    </div>
+                    <div style="padding: 20px;">
+                        <canvas id="impactChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const chartData = <% - JSON.stringify(chartData) %>;
+
+        // Community Growth Chart
+        new Chart(document.getElementById('communityChart'), {
+            type: 'line',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: 'Active Users',
+                    data: chartData.userGrowth,
+                    borderColor: '#2ecc71',
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: 'rgba(46, 204, 113, 0.1)'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        // Donation Trend Chart
+        new Chart(document.getElementById('impactChart'), {
+            type: 'bar',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: 'Successful Pickups',
+                    data: chartData.listingGrowth,
+                    backgroundColor: '#3498db',
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    </script>
+
+    <%- include('../layout/footer') %>

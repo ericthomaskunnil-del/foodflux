@@ -116,9 +116,19 @@
                                                         <button type="button" class="btn btn-sm btn-danger"
                                                             onclick="confirmAction('Delete this listing?', 'del-<%= listing._id %>')">Delete</button>
                                                     </form>
+                                                    <div
+                                                        style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">
+                                                        QR code generates on pickup
+                                                    </div>
                                                     <% } else { %>
-                                                        <span class="text-muted">—</span>
                                                         <% } %>
+                                                            <% if (listing.status==='picked' ) { %>
+                                                                <a href="/donor/qr/<%= listing._id %>"
+                                                                    class="btn btn-sm btn-nav">View QR</a>
+                                                                <% } %>
+                                                                    <% if (listing.status==='completed' ) { %>
+                                                                        <span class="text-muted">Verified ✓</span>
+                                                                        <% } %>
                                             </td>
                                         </tr>
                                         <% }) %>

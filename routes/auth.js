@@ -12,5 +12,6 @@ router.post('/login', authController.postLogin);
 router.get('/register', authController.getRegister);
 router.post('/register', authController.postRegister);
 router.get('/logout', authController.logout);
+router.post('/save-token', authController.saveFCMToken);
 
 module.exports = router;

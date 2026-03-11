@@ -69,6 +69,70 @@
             document.getElementById(formId).submit();
         }
     }
+
+    // --- Theme Toggle Logic ---
+    const themeToggle = document.getElementById('themeToggle');
+    const htmlElement = document.documentElement;
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    htmlElement.setAttribute('data-theme', savedTheme);
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+
+            // Optional: Multi-tab sync
+            window.dispatchEvent(new Event('storage'));
+        });
+    }
+
+    // Multi-tab sync listener
+    window.addEventListener('storage', () => {
+        const theme = localStorage.getItem('theme');
+        if (theme) htmlElement.setAttribute('data-theme', theme);
+    });
+    // --- FCM Frontend Registration ---
+    <% if (typeof user !== 'undefined' && user) { %>
+    if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/firebase-messaging-sw.js')
+                .then((registration) => {
+                    console.log('SW registered:', registration);
+                    // In a real app, you would initialize Firebase JS SDK here
+                    // and call messaging.getToken({ serviceWorkerRegistration: registration })
+                    // For this demo, we mock a token generation if permission is granted
+
+                    if (Notification.permission === 'default') {
+                        // Simulating a slight delay for better UX
+                        setTimeout(() => {
+                            Notification.requestPermission().then(permission => {
+                                if (permission === 'granted') {
+                                    mockRegisterToken();
+                                }
+                            });
+                        }, 5000);
+                    } else if (Notification.permission === 'granted') {
+                        mockRegisterToken();
+                    }
+                });
+        }
+
+        function mockRegisterToken() {
+            // Mocking a Firebase token for demonstration
+            const mockToken = 'FCM_MOCK_' + Math.random().toString(36).substr(2, 9);
+            fetch('/auth/save-token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: mockToken })
+            }).then(res => res.json())
+                .then(data => console.log('FCM Token Saved:', data))
+                .catch(err => console.error('FCM Error:', err));
+        }
+    <% } %>
 </script>
 </body>
 

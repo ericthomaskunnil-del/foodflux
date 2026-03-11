@@ -45,6 +45,53 @@
                         </div>
                     </div>
 
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="foodType">Food Type *</label>
+                            <select id="foodType" name="foodType" required>
+                                <option value="Veg" <%=(listing && listing.foodType==='Veg' ) ? 'selected' : '' %>>Veg
+                                </option>
+                                <option value="Non-Veg" <%=(listing && listing.foodType==='Non-Veg' ) ? 'selected' : ''
+                                    %>>Non-Veg</option>
+                                <option value="Mixed" <%=(listing && listing.foodType==='Mixed' ) ? 'selected' : '' %>
+                                    >Mixed</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="servingsAvailable">Servings Available *</label>
+                            <input type="number" id="servingsAvailable" name="servingsAvailable" min="1"
+                                placeholder="Number of people it can feed"
+                                value="<%= listing ? listing.servingsAvailable : '' %>" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="preparedTime">Prepared Time *</label>
+                            <input type="datetime-local" id="preparedTime" name="preparedTime"
+                                value="<%= (listing && listing.preparedTime) ? new Date(listing.preparedTime.getTime() - listing.preparedTime.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : '' %>"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label for="storageMethod">Storage Method *</label>
+                            <select id="storageMethod" name="storageMethod" required>
+                                <option value="Room Temperature" <%=(listing &&
+                                    listing.storageMethod==='Room Temperature' ) ? 'selected' : '' %>>Room Temperature
+                                </option>
+                                <option value="Refrigerated" <%=(listing && listing.storageMethod==='Refrigerated' )
+                                    ? 'selected' : '' %>>Refrigerated</option>
+                                <option value="Frozen" <%=(listing && listing.storageMethod==='Frozen' ) ? 'selected'
+                                    : '' %>>Frozen</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="allergens">Allergens (Optional, comma separated)</label>
+                        <input type="text" id="allergens" name="allergens" placeholder="e.g. Nuts, Dairy, Gluten"
+                            value="<%= (listing && listing.allergens) ? listing.allergens.join(', ') : '' %>">
+                    </div>
+
                     <div class="form-group">
                         <label for="location">Pickup Location *</label>
                         <input type="text" id="location" name="location" placeholder="Full address for pickup"

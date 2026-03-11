@@ -13,7 +13,8 @@ router.get('/', isVolunteer, volunteerController.getDashboard);
 router.get('/directory', isVolunteer, volunteerController.getDirectory);
 router.post('/accept/:id', isVolunteer, volunteerController.acceptPickup);
 router.post('/collect/:id', isVolunteer, volunteerController.markCollected);
-
+router.post('/verify-pickup/:transactionId', isVolunteer, volunteerController.verifyPickup);
+router.post('/request-verification', isVolunteer, volunteerController.requestVerification);
 // Rating routes
 router.get('/rate/:transactionId', isVolunteer, volunteerController.showRateDonor);
 router.post('/rate/:transactionId', isVolunteer, volunteerController.submitRating);

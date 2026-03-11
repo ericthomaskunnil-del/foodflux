@@ -21,12 +21,12 @@ const isAdmin = (req, res, next) => {
     return res.redirect('/auth/login');
 };
 
-// Check if user is donor
+// Check if user is donor or corporate partner
 const isDonor = (req, res, next) => {
-    if (req.session && req.session.user && req.session.user.role === 'donor') {
+    if (req.session && req.session.user && (req.session.user.role === 'donor' || req.session.user.role === 'corporate_partner')) {
         return next();
     }
-    req.session.error = 'Access denied. Donor privileges required.';
+    req.session.error = 'Access denied. Donor or Partner privileges required.';
     return res.redirect('/auth/login');
 };
 
